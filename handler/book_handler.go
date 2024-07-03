@@ -22,7 +22,7 @@ func (h *bookHandler) FindAllBookHandler(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err,
+			"error": err.Error(),
 		})
 		return
 	}
@@ -45,7 +45,7 @@ func (h *bookHandler) FindByIdHandler(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err,
+			"error": err.Error(),
 		})
 		return
 	}
@@ -58,12 +58,16 @@ func (h *bookHandler) FindByIdHandler(c *gin.Context) {
 func (h *bookHandler) CreateNewBookHandler(c *gin.Context) {
 	var book model.Book
 	if err := c.ShouldBindJSON(&book); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
 	if err := h.bookService.CreateNewBook(&book); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -76,18 +80,49 @@ func (h *bookHandler) DeleteBookHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("book_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid book id",
+			"error": err.Error(),
 		})
+		return
 	}
 
 	if err := h.bookService.DeleteBook(id); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err,
+			"error": err.Error(),
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "success delete book",
+	})
+}
+
+func (h *bookHandler) UpdateBookHandler(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("book_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid book id",
+		})
+		return
+	}
+
+	var book model.Book
+	if err := c.ShouldBindJSON(&book); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if err := h.bookService.UpdateBook(id, &book); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":    book,
+		"message": "success update book",
 	})
 }

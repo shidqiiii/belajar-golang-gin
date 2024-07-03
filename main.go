@@ -36,7 +36,7 @@ func main() {
 	v1.POST("/book", bookHandler.CreateNewBookHandler)
 	v1.GET("/book/:book_id", bookHandler.FindByIdHandler)
 	v1.DELETE("/book/:book_id", bookHandler.DeleteBookHandler)
-	// v1.PUT("/:book_id", handler.UpdateBookHandler)
+	v1.PUT("book/:book_id", bookHandler.UpdateBookHandler)
 
 	r.Run(":8080")
 

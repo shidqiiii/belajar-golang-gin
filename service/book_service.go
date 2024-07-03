@@ -10,6 +10,7 @@ type BookService interface {
 	FindById(id int) (model.Book, error)
 	CreateNewBook(book *model.Book) error
 	DeleteBook(id int) error
+	UpdateBook(id int, book *model.Book) error
 }
 
 type bookService struct {
@@ -37,6 +38,29 @@ func (s *bookService) CreateNewBook(book *model.Book) error {
 }
 
 func (s *bookService) DeleteBook(id int) error {
-	err := s.repository.DeleteBook(id)
-	return err
+	_, err := s.repository.FindById(id)
+	if err != nil {
+		return err
+	}
+
+	err = s.repository.DeleteBook(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *bookService) UpdateBook(id int, book *model.Book) error {
+	_, err := s.repository.FindById(id)
+	if err != nil {
+		return err
+	}
+
+	err = s.repository.UpdateBook(id, book)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

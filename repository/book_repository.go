@@ -13,6 +13,7 @@ type BookRepository interface {
 	FindById(id int) (model.Book, error)
 	CreateNewBook(book *model.Book) error
 	DeleteBook(id int) error
+	UpdateBook(id int, book *model.Book) error
 }
 
 type bookRepository struct {
@@ -65,9 +66,20 @@ func (r *bookRepository) CreateNewBook(book *model.Book) error {
 }
 
 func (r *bookRepository) DeleteBook(id int) error {
-	_, err := r.conn.Exec(context.Background(), "DELETE FROM books where book_id = $1", id)
+	_, err := r.conn.Exec(context.Background(), "DELETE FROM books WHERE book_id = $1", id)
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (r *bookRepository) UpdateBook(id int, book *model.Book) error {
+	book.UpdatedAt = time.Now()
+
+	_, err := r.conn.Exec(context.Background(), "UPDATE books SET title = $1, price = $2, updated_at = $3 WHERE book_id = $4", book.Title, book.Price, book.UpdatedAt, id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
